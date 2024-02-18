@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- mapper为映射的根节点-->
+<!-- mapper为映射的根节点，namespace指定Dao接口的完整类名
+mybatis会依据这个接口动态创建一个实现类去实现这个接口，
+而这个实现类是一个Mapper对象-->
+<mapper namespace="com.leiyuan.mapper.AddressBookMapper">
+    <!--id ="接口中的方法名"
+　　parameterType="传入的参数类型"
+　　resultType = "返回实体类对象，使用包.类名"-->
+
+    <select id="selectUserAllAddressByUserId"
+            resultType="com.leiyuan.entity.AddressBook">
+        select id,
+                   user_id,
+            consignee,
+            sex,
+            phone,
+            email,
+            province_code,
+            province_name,
+            city_code,
+            city_name,
+            district_code,
+            district_name,
+            detail,
+            label,
+            is_default,
+            create_time,
+            update_time,
+            create_user,
+            update_user,
+            is_deleted
+
+        from address_book
+        where user_id = #{id}
+    </select>
+
+    <select id="selectUserAddressByUserIdAndStatus" resultType="com.leiyuan.entity.AddressBook">
+        select id,
+               user_id,
+               consignee,
+               sex,
+               phone,
+               email,
+               province_code,
+               province_name,
+               city_code,
+               city_name,
+               district_code,
+               district_name,
+               detail,
+               label,
+               is_default,
+               create_time,
+               update_time,
+               create_user,
+               update_user,
+               is_deleted
+
+        from address_book
+        where user_id = #{id}
+        and is_default = 1
+    </select>
+
+    <update id="updateUserAddressStatusByAddressId" parameterType="com.leiyuan.entity.AddressBook">
+        update address_book
+        set is_default = #{isDefault}
+    </update>
+</mapper>

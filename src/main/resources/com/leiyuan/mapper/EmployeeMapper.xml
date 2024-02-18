@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- mapper为映射的根节点-->
+<!-- mapper为映射的根节点，namespace指定Dao接口的完整类名
+mybatis会依据这个接口动态创建一个实现类去实现这个接口，
+而这个实现类是一个Mapper对象-->
+<mapper namespace="com.leiyuan.mapper.EmployeeMapper">
+    <!--id ="接口中的方法名"
+　　parameterType="传入的参数类型"
+　　resultType = "返回实体类对象，使用包.类名"-->
+    <resultMap id="employeeMap" type="com.leiyuan.entity.Employee">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="username" property="username"/>
+        <result column="password" property="password"/>
+        <result column="phone" property="phone"/>
+        <result column="sex" property="sex"/>
+        <result column="id_number" property="idNumber"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="update_user" property="updateUser"/>
+    </resultMap>
+
+    <select id="selectEmployeeByUsernameAndPassword"
+            resultType="com.leiyuan.entity.Employee">
+        select id,
+            `name`,
+            username,
+            password,
+            phone,
+            sex,
+            id_number,
+            status,
+            create_time,
+            update_time,
+            create_user,
+            update_user
+
+        from employee
+        where username = #{username}
+    </select>
+
+    <select id="selectEmployeeByPage"
+            resultType="com.leiyuan.entity.Employee">
+        select id,
+               `name`,
+               username,
+               password,
+               phone,
+               sex,
+               id_number,
+               status,
+               create_time,
+               update_time,
+               create_user,
+               update_user
+
+        from employee
+    </select>
+
+    <select id="selectEmployeeByPageAndName"
+            resultType="com.leiyuan.entity.Employee">
+        select id,
+               `name`,
+               username,
+               password,
+               phone,
+               sex,
+               id_number,
+               status,
+               create_time,
+               update_time,
+               create_user,
+               update_user
+
+        from employee
+        where `name` like concat('%',#{name},'%')
+    </select>
+
+    <select id="selectEmployeeTotal" resultType="integer">
+        select count(*) from employee
+    </select>
+
+    <select id="selectEmployeeTotalByName" resultType="integer">
+        select count(*) from employee
+        where `name` like concat('%',#{name},'%')
+    </select>
+
+    <update id="updateEmployeeStatusById">
+        update employee set status = #{status},
+                            update_time = #{updateTime},
+                            update_user = #{updateUser}
+        where id = #{id}
+    </update>
+
+    <select id="selectEmployeeById" parameterType="long"
+            resultType="com.leiyuan.entity.Employee">
+        select id,
+               `name`,
+               username,
+               password,
+               phone,
+               sex,
+               id_number,
+               status,
+               create_time,
+               update_time,
+               create_user,
+               update_user
+
+        from employee
+        where id = #{id}
+    </select>
+
+    <update id="updateEmployeeById">
+        update employee set `name` = #{name},
+                            username = #{username},
+                            phone = #{phone},
+                            sex = #{sex},
+                            id_number = #{idNumber},
+                            update_time = #{updateTime},
+                            update_user = #{updateUser}
+        where id = #{id}
+    </update>
+
+    <insert id="addEmployee">
+        insert into employee(`name`,
+                             username,
+                             password,
+                             phone,
+                             sex,
+                             id_number,
+                             status,
+                             create_time,
+                             update_time,
+                             create_user,
+                             update_user)
+        values(#{name},#{username},#{password},#{phone},#{sex},#{idNumber},#{status},
+               #{createTime},#{updateTime},#{createUser},#{updateUser})
+    </insert>
+
+</mapper>

@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- mapper为映射的根节点-->
+<!-- mapper为映射的根节点，namespace指定Dao接口的完整类名
+mybatis会依据这个接口动态创建一个实现类去实现这个接口，
+而这个实现类是一个Mapper对象-->
+<mapper namespace="com.leiyuan.mapper.SetmealMapper">
+    <!--id ="接口中的方法名"
+　　parameterType="传入的参数类型"
+　　resultType = "返回实体类对象，使用包.类名"-->
+
+    <resultMap id="setmealMap" type="com.leiyuan.entity.Setmeal">
+        <id column="id" property="id"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="name" property="name"/>
+        <result column="price" property="price"/>
+        <result column="status" property="status"/>
+        <result column="code" property="code"/>
+        <result column="description" property="description"/>
+        <result column="image" property="image"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <collection property="category" ofType="com.leiyuan.entity.Category">
+            <result column="cname" property="name"/>
+        </collection>
+
+    </resultMap>
+
+    <resultMap id="setmealWithDishMap" type="com.leiyuan.entity.Setmeal">
+        <id column="id" property="id"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="name" property="name"/>
+        <result column="price" property="price"/>
+        <result column="status" property="status"/>
+        <result column="code" property="code"/>
+        <result column="description" property="description"/>
+        <result column="image" property="image"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <collection property="setmealDishes" ofType="com.leiyuan.entity.SetmealDish">
+            <id column="did" property="id"/>
+            <result column="dish_id" property="dishId"/>
+            <result column="dname" property="name"/>
+            <result column="dprice" property="price"/>
+            <result column="dcopies" property="copies"/>
+            <result column="dsort" property="sort"/>
+            <result column="dctime" property="createTime"/>
+            <result column="dutime" property="updateTime"/>
+            <result column="dcuser" property="createUser"/>
+            <result column="duuser" property="updateUser"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectAllSetmealByPageAndName"
+            resultMap="setmealMap">
+        select setmeal.id,
+                setmeal.category_id,
+                setmeal.name,
+                setmeal.price,
+                setmeal.status,
+                setmeal.code,
+                setmeal.description,
+                setmeal.image,
+                setmeal.create_time,
+                setmeal.update_time,
+                setmeal.create_user,
+                setmeal.update_user,
+                setmeal.is_deleted,
+
+                category.name cname
+        from setmeal,category
+        where setmeal.category_id = category.id
+        <if test="name !=null and name != ''">
+            and setmeal.name like concat('%',#{name},'%')
+        </if>
+    </select>
+
+    <select id="SelectSetmealTotal" resultType="integer">
+        SELECT COUNT(*) FROM setmeal
+        <if test="name !=null and name != ''">
+        WHERE name like concat('%',#{name},'%')
+        </if>
+    </select>
+
+    <update id="updateSetmealStatusById">
+        update setmeal
+        set status = #{status}
+        where id in
+        <foreach collection="ids" open="(" separator="," close=")" item="id" index="index">
+            #{id}
+        </foreach>
+    </update>
+
+    <insert id="addSetmeal" parameterType="com.leiyuan.entity.Setmeal">
+        insert into setmeal
+        values (#{id},#{categoryId},#{name},#{price},#{status},#{code},
+                #{description},#{image},#{createTime},#{updateTime},#{createUser},#{updateUser},#{isDeleted})
+    </insert>
+
+    <select id="selectSetmealByCode" resultType="com.leiyuan.entity.Setmeal">
+        select id,
+               category_id,
+               `name`,
+               price,
+               status,
+               code,
+               description,
+               image,
+               create_time,
+               update_time,
+               create_user,
+               update_user,
+               is_deleted
+        from setmeal
+        where code = #{code}
+    </select>
+
+    <delete id="deleteSetmealByIds">
+        delete
+        from setmeal
+        where id in
+        <foreach collection="list" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selectSetmealWithDishById" parameterType="long"
+            resultMap="setmealWithDishMap">
+        select setmeal.id,
+               setmeal.category_id,
+               setmeal.name,
+               setmeal.price,
+               setmeal.status,
+               setmeal.code,
+               setmeal.description,
+               setmeal.image,
+               setmeal.create_time,
+               setmeal.update_time,
+               setmeal.create_user,
+               setmeal.update_user,
+               setmeal.is_deleted,
+
+               d.id did,
+            d.dish_id,
+            d.name dname,
+            d.price dprice,
+            d.copies dcopies,
+            d.sort dsort,
+            d.create_time dctime,
+            d.update_time dutime,
+            d.create_user dcuser,
+            d.update_user duuser
+
+        from setmeal
+            left join setmeal_dish d
+        on setmeal.id = d.setmeal_id
+        where setmeal.id = #{id}
+    </select>
+
+    <update id="updateSetmeal" parameterType="com.leiyuan.entity.Setmeal">
+        update setmeal
+        set category_id = #{categoryId},
+            `name` = #{name},
+            price = #{price},
+            description = #{description},
+            image = #{image},
+            update_time = #{updateTime},
+            update_user = #{updateUser}
+        where id = #{id}
+    </update>
+
+    <select id="selectSetmealByCategoryId" resultMap="setmealWithDishMap">
+        select setmeal.id,
+               setmeal.category_id,
+               setmeal.name,
+               setmeal.price,
+               setmeal.status,
+               setmeal.code,
+               setmeal.description,
+               setmeal.image,
+               setmeal.create_time,
+               setmeal.update_time,
+               setmeal.create_user,
+               setmeal.update_user,
+               setmeal.is_deleted,
+
+               d.id did,
+               d.dish_id,
+               d.name dname,
+               d.price dprice,
+               d.copies dcopies,
+               d.sort dsort,
+               d.create_time dctime,
+               d.update_time dutime,
+               d.create_user dcuser,
+               d.update_user duuser
+
+        from setmeal,setmeal_dish d
+        where setmeal.id = d.setmeal_id
+        and setmeal.category_id = #{categoryId}
+        and setmeal.status = #{status}
+    </select>
+
+</mapper>

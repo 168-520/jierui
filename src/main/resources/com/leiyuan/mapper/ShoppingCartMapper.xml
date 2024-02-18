@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- mapper为映射的根节点-->
+<!-- mapper为映射的根节点，namespace指定Dao接口的完整类名
+mybatis会依据这个接口动态创建一个实现类去实现这个接口，
+而这个实现类是一个Mapper对象-->
+<mapper namespace="com.leiyuan.mapper.ShoppingCartMapper">
+    <!--id ="接口中的方法名"
+　　parameterType="传入的参数类型"
+　　resultType = "返回实体类对象，使用包.类名"-->
+
+    <select id="selectDishByDishId"
+            resultType="com.leiyuan.entity.ShoppingCart">
+        select id,
+                   `name`,
+            image,
+            user_id,
+            dish_id,
+            setmeal_id,
+            dish_flavor,
+            `number`,
+            amount,
+            create_time
+
+        from shopping_cart
+        where dish_id = #{dishId}
+        and user_id = #{userId}
+    </select>
+
+    <select id="selectSetmealBySetmealId"
+            resultType="com.leiyuan.entity.ShoppingCart">
+        select id,
+               `name`,
+               image,
+               user_id,
+               dish_id,
+               setmeal_id,
+               dish_flavor,
+               `number`,
+               amount,
+               create_time
+
+        from shopping_cart
+        where setmeal_id = #{setmealId}
+          and user_id = #{userId}
+    </select>
+
+    <select id="selectAllShoppingCartByUserId" parameterType="long"
+            resultType="com.leiyuan.entity.ShoppingCart">
+        select id,
+               `name`,
+               image,
+               user_id,
+               dish_id,
+               setmeal_id,
+               dish_flavor,
+               `number`,
+               amount,
+               create_time
+        from shopping_cart
+        where user_id = #{userId}
+    </select>
+
+    <update id="updateShoppingCartNumber" parameterType="com.leiyuan.entity.ShoppingCart">
+        update shopping_cart
+        set `number` = #{number}
+        where id = #{id}
+    </update>
+
+    <insert id="addShoppingCart" parameterType="com.leiyuan.entity.ShoppingCart">
+        insert into shopping_cart(`name`,
+                                  image,
+                                  user_id,
+                                  dish_id,
+                                  setmeal_id,
+                                  dish_flavor,
+                                  `number`,
+                                  amount,
+                                  create_time)
+        values (#{name},#{image},#{userId},#{dishId},#{setmealId},#{dishFlavor},#{number},#{amount},#{createTime})
+    </insert>
+
+    <delete id="deleteShoppingCartByDishId">
+        delete from shopping_cart
+        where dish_id = #{dishId}
+          and user_id = #{userId}
+    </delete>
+
+    <delete id="deleteShoppingCartBySetmealId">
+        delete from shopping_cart
+        where setmeal_id = #{setmealId}
+          and user_id = #{userId}
+    </delete>
+
+    <delete id="deleteShoppingCart"
+            parameterType="long">
+        delete from shopping_cart
+        where user_id = #{userId}
+    </delete>
+
+</mapper>

@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- mapper为映射的根节点-->
+<!-- mapper为映射的根节点，namespace指定Dao接口的完整类名
+mybatis会依据这个接口动态创建一个实现类去实现这个接口，
+而这个实现类是一个Mapper对象-->
+<mapper namespace="com.leiyuan.mapper.DishMapper">
+    <!--id ="接口中的方法名"
+　　parameterType="传入的参数类型"
+　　resultType = "返回实体类对象，使用包.类名"-->
+
+    <resultMap id="dishMap" type="com.leiyuan.entity.Dish">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="price" property="price"/>
+        <result column="code" property="code"/>
+        <result column="image" property="image"/>
+        <result column="description" property="description"/>
+        <result column="status" property="status"/>
+        <result column="sort" property="sort"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <collection property="flavors" ofType="com.leiyuan.entity.DishFlavor">
+            <id column="fid" property="id"/>
+            <result column="fname" property="name"/>
+            <result column="value" property="value"/>
+            <result column="fcreate_time" property="createTime"/>
+            <result column="fupdate_time" property="updateTime"/>
+            <result column="fcreate_user" property="createUser"/>
+            <result column="fupdate_user" property="updateUser"/>
+            <result column="fdeleted" property="isDeleted"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectDishByPageAndName" resultType="com.leiyuan.entity.Dish">
+        SELECT id,
+        `name`,
+        category_id,
+        price,
+        `code`,
+        image,
+        description,
+        `status`,
+        sort,
+        create_time,
+        update_time,
+        create_user,
+        update_user,
+        is_deleted
+        FROM dish
+        <if test="name !=null">
+            WHERE `name` like concat('%',#{name},'%')
+        </if>
+    </select>
+
+    <select id="selectDishTotal" resultType="integer">
+        SELECT COUNT(*) FROM dish
+    </select>
+
+    <select id="selectDishById" resultMap="dishMap">
+        SELECT dish.id,
+               dish.name,
+               dish.category_id,
+               dish.price,
+               dish.code,
+               dish.image,
+               dish.description,
+               dish.status,
+               dish.sort,
+               dish.create_time,
+               dish.update_time,
+               dish.create_user,
+               dish.update_user,
+               dish.is_deleted,
+
+                df.id fid,
+                df.name fname,
+                df.value,
+                df.create_time fcreate_time,
+                df.update_time fupdate_time,
+                df.create_user fcreate_user,
+                df.update_user fupdate_user,
+                df.is_deleted fdeleted
+
+        FROM dish,dish_flavor df
+        WHERE dish.id =df.dish_id
+        AND dish.id = #{id}
+    </select>
+
+    <delete id="deleteDishById">
+        DELETE
+        FROM dish
+        WHERE id in
+        <foreach collection="list" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--使用@Param注解指定参数时，foreach中的属性collection应与@Param注解指定的参数一致-->
+    <update id="updateDishStatusById">
+        UPDATE dish
+        SET status = #{status}
+        WHERE id in
+        <foreach collection="ids" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <insert id="addDish" parameterType="com.leiyuan.entity.Dish">
+        INSERT INTO dish(`name`,
+                         category_id,
+                         price,
+                         code,
+                         image,
+                         description,
+                         create_time,
+                         update_time,
+                         create_user,
+                         update_user)
+        VALUES(#{name},#{categoryId},#{price},#{code},#{image},#{description},
+               #{createTime},#{updateTime},#{createUser},#{updateUser})
+    </insert>
+
+    <select id="selectDishByCode" resultType="com.leiyuan.entity.Dish">
+        select id,
+            `name`,
+            category_id,
+            price,
+            code,
+            image,
+            description,
+            status,
+            sort,
+            create_time,
+            update_time,
+            create_user,
+            update_user,
+            is_deleted
+        from dish
+        where code = #{code}
+    </select>
+
+    <update id="updateDishAndDishFlavors">
+        update dish
+        set `name` = #{name},
+            category_id = #{categoryId},
+            price = #{price},
+            image = #{image},
+            description = #{description},
+            update_time = #{updateTime},
+            update_user = #{updateUser}
+        where id = #{id}
+    </update>
+
+    <select id="selectAllDishByCategoryId" resultMap="dishMap">
+        select dish.id,
+               dish.name,
+               dish.category_id,
+               dish.price,
+               dish.code,
+               dish.image,
+               dish.description,
+               dish.status,
+               dish.sort,
+               dish.create_time,
+               dish.update_time,
+               dish.create_user,
+               dish.update_user,
+               dish.is_deleted,
+
+               df.id fid,
+               df.name fname,
+               df.value,
+               df.create_time fcreate_time,
+               df.update_time fupdate_time,
+               df.create_user fcreate_user,
+               df.update_user fupdate_user,
+               df.is_deleted fdeleted
+        FROM dish,dish_flavor df
+        WHERE dish.id =df.dish_id
+        and dish.category_id = #{categoryId}
+    </select>
+</mapper>
